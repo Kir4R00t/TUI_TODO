@@ -1,6 +1,6 @@
-from textual.app import App, ComposeResult # type: ignore
 from textual.widgets import Header, Footer, Input, Button, ListView, ListItem, Static, Label # type: ignore
 from textual.containers import Horizontal, Vertical # type: ignore
+from textual.app import App, ComposeResult # type: ignore
 from textual.reactive import reactive # type: ignore
 from typing import Any
 import logging
@@ -17,11 +17,14 @@ def load_tasks() -> list[dict[str, Any]]:
             if isinstance(data, list):
                 return sorted(data, key=lambda t: t.get("id", 0), reverse=True)
             return []
+    
     except FileNotFoundError:
         return []
+    
     except json.JSONDecodeError:
         return []
 
+# Defining task
 class TaskItem(ListItem):
     def __init__(self, task: dict[str, Any]) -> None:
         self.task_data = task
@@ -40,6 +43,7 @@ class TaskItem(ListItem):
 
 
 class TasksTUI(App):
+    # Defining front-end
     CSS = """
         Screen { layout: vertical; }
         #topbar { height: 5; padding: 1 1; }
@@ -50,16 +54,6 @@ class TasksTUI(App):
         ListView > ListItem { padding: 0 1; min-height: 1; height: auto; }
         .task { height: 1; overflow: hidden; text-overflow: ellipsis; }
     """
-
-    # Keyboard shortcuts
-    BINDINGS = [
-        ("d", "delete_selected", "Delete selected"),
-        ("r", "refresh", "Refresh"),
-        ("enter", "add_from_focus", "Add when focused on inputs"),
-        ("q", "quit", "Quit"),
-    ]
-
-    status_text = reactive("ready")
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -73,6 +67,16 @@ class TasksTUI(App):
         yield Label(self.status_text, id="status")
         yield Footer()
 
+    # Keyboard shortcuts
+    BINDINGS = [
+        ("d", "delete_selected", "Delete selected"),
+        ("r", "refresh", "Refresh"),
+        ("enter", "add_from_focus", "Add when focused on inputs"),
+        ("q", "quit", "Quit"),
+    ]
+
+    status_text = reactive("ready")
+
     def on_mount(self) -> None:
         self.refresh_tasks()
 
@@ -85,6 +89,7 @@ class TasksTUI(App):
         elif event.button.id == "delete_btn":
             self.delete_selected()
 
+    # Declaring Actions
     def action_refresh(self) -> None:
         self.refresh_tasks()
 
@@ -96,11 +101,13 @@ class TasksTUI(App):
         if isinstance(focus, Input):
             self.add_task_from_inputs()
 
+    # Front-end logs
     def set_status(self, msg: str, ok: bool = True) -> None:
         status = self.query_one("#status", Label)
         status.update(msg)
         status.styles.color = "green" if ok else "tomato"
 
+    # Refresh from file
     def refresh_tasks(self) -> None:
         lst = self.query_one("#tasks_list", ListView)
         lst.clear()
@@ -108,6 +115,7 @@ class TasksTUI(App):
             lst.append(TaskItem(t))
         self.set_status(f"Loaded {len(lst.children)} tasks")
 
+    # Add task button
     def add_task_from_inputs(self) -> None:
         title = self.query_one("#title_in", Input).value.strip()
         desc = self.query_one("#desc_in", Input).value.strip()
@@ -124,6 +132,7 @@ class TasksTUI(App):
         self.refresh_tasks()
         self.set_status(f'Added "{title}"')
 
+    # Delete selected task button
     def delete_selected(self) -> None:
         lst = self.query_one("#tasks_list", ListView)
         if lst.index is not None and 0 <= lst.index < len(lst.children):
