@@ -6,7 +6,7 @@ Typical TO-DO app made using python with TUI front-end
 ```python -m venv .venv``` <br>
 ``` .\venv\Scripts\Activate.ps1``` <br>
 ```pip install -r requirements.txt``` <br>
-```run.bat```
+```.\run.bat```
 ### Linux
 ```python3 -m venv .venv``` <br>
 ``` .\venv\Scripts\activate``` <br>
