@@ -11,4 +11,4 @@ Typical TO-DO app made using python with TUI front-end
 ```python3 -m venv .venv``` <br>
 ``` .\venv\Scripts\activate``` <br>
 ```pip3 install -r requirements.txt``` <br>
-```run.sh```
+```./run.sh```
